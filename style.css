@@ -1,0 +1,114 @@
+@font-face {
+  font-family: retro;
+  src: url(./font/ARCADECLASSIC.TTF);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: retro;
+}
+body {
+  background: #222;
+  box-sizing: border-box;
+  color: #eee;
+}
+header {
+  position: relative;
+}
+
+.upsec {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+}
+.btn {
+  border: none;
+  background-color: #eee;
+  transition: 0.5s;
+  color: #222;
+  font-size: 2rem;
+  border-radius: 5px;
+  padding: 2rem 3rem;
+  cursor: pointer;
+}
+header p {
+  font-size: 2rem;
+  letter-spacing: 5px;
+}
+h1 {
+  font-size: 4rem;
+  text-align: center;
+  margin-top: 30px;
+  letter-spacing: 5px;
+  padding-bottom: 2rem;
+}
+
+.shape {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.box {
+  /* position: absolute; */
+  width: 8rem;
+  height: 8rem;
+  border-radius: 5px;
+  background: #eee;
+  color: #222;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 5rem;
+}
+.line {
+  position: absolute;
+  width: 100%;
+  height: 10px;
+  background: #eee;
+  z-index: -1;
+}
+section {
+  margin-top: 5rem;
+  display: flex;
+  justify-content: space-between;
+  padding: 2rem;
+}
+.left {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.guess {
+  background: none;
+  border: 2px solid #eee;
+  color: #eee;
+  border-radius: 5px;
+  font-size: 5rem;
+  padding: 2.5rem;
+  width: 15rem;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.check {
+  border: none;
+  background-color: #eee;
+  transition: 0.5s;
+  color: #222;
+  font-size: 2rem;
+  border-radius: 5px;
+  padding: 2rem 3rem;
+  cursor: pointer;
+}
+.right {
+  font-size: 2rem;
+  letter-spacing: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px 0px;
+}

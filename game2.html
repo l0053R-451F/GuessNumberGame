@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<button id="connect" onclick="connect()">connect</button>
+<button  onclick="send()">send</button>
+<script>
+    let ws
+
+    function heartbeat() {
+        clearTimeout(this.pingTimeout);
+        this.pingTimeout = setTimeout(() => {
+            this.terminate();
+            console.log('dead')
+        }, 300+ 100);
+    }
+
+    function connect(){
+        //live https://ishaf-ws.herokuapp.com/
+        ws = new WebSocket('ws://localhost:8485/api/v1/ws/game1')
+        ws.addEventListener('ping',heartbeat)
+        ws.addEventListener("open", (res)=>{
+            console.log('Connected')
+            const payLoad = {
+                'action': 'connect',
+                'username': 'ishaf'
+            }
+            ws.send(JSON.stringify(payLoad))
+            ws.addEventListener("message", (res)=>{
+                const data = JSON.parse(res.data)
+                if (data.message){
+                    console.log(data.message) // need to make some specific method
+                }
+                localStorage.setItem('id',data.id)
+            })
+        })
+
+    }
+    function send(){
+        const payLoad = {
+            'action': 'testmessage',
+            'message': 'ping pong heartbeat'
+        }
+        ws.send(JSON.stringify(payLoad))
+    }
+    if (ws){
+
+        ws.on('close', function clear() {
+            clearTimeout(this.pingTimeout);
+        });
+    }
+    const id =  localStorage.getItem('id');
+    if (id){
+        //document.getElementById('connect').disabled =true
+        console.log('test storage',id) // now need to reconnect with existing id
+    }
+</script>
+</body>
+</html>

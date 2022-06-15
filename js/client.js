@@ -1,5 +1,6 @@
 let ws
 let gamesAvail
+
 function heartbeat() {
     clearTimeout(this.pingTimeout);
     this.pingTimeout = setTimeout(() => {
@@ -25,7 +26,7 @@ function connect() {
             const data = JSON.parse(res.data)
             if (data.message === 'gamesAvailResponse') {
                 gamesAvail = data.gameList
-                document.getElementById("gameList").innerHTML= JSON.stringify(gamesAvail);
+                document.getElementById("gameList").innerHTML = JSON.stringify(gamesAvail);
             }
         })
     })

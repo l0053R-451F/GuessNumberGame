@@ -53,12 +53,13 @@ function sendAvailableGameToSelf(id) {
         if (ws.uid === id) {
             ws.send(JSON.stringify({
                 'message': 'gamesAvailResponse',
-                 gameList,
+                gameList,
 
             }))
         }
     })
 }
+
 function sendAvailableGameToAll() {
     wss.clients.forEach(ws => {
         ws.send(JSON.stringify({

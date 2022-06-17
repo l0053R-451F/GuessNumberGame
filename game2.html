@@ -3,11 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<button id="connect" onclick="connect()">connect</button>
-<button onclick="createNewGame()">Create Game</button>
-<div id="gameList"></div>
-<script src="js/client.js"></script>
+<div class="game2">
+    <div class="game2-header">
+        <button class="btn" id="connect" onclick="connect()">connect</button>
+        <div id="userInfo"></div>
+        <button class="btn" onclick="createNewGame()">Create Game</button>
+    </div>
+
+    <div class="game-container">
+        <div>
+            <div>Available Games</div>
+            <div id="gameList"></div>
+        </div>
+        <div style="width: 100%;">
+            <div  id="result">Result: 25546</div>
+            <div class="game-bord">
+                <div>
+                    player1
+                </div>
+                <div class="game-card-container">
+                    <div>
+                        <div class=" card-row">
+                            <div class="card">dfsd</div>
+                            <div class="card">dfsd</div>
+                            <div class="card">dfsd</div>
+                            <div class="card">dfsd</div>
+                            <div class="card">dfsd</div>
+                            <div class="card">dfsd</div>
+                            <div class="card">dfsd</div>
+                            <div class="card">dfsd</div>
+                            <div class="card">dfsd</div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    player2
+                </div>
+            </div>
+        </div>
+        <div class="chat-box">
+            <h2>Chat Box</h2>
+            <br>
+            <h4>In Game</h4>
+            <div id="in-game-chat">
+                <div class="message-input">
+                    <textarea rows="5"> </textarea>
+                    <button class="send"> Send</button>
+                </div>
+            </div>
+            <h4>Global</h4>
+            <div id="global-chat">
+                <div class="message-input">
+                    <textarea rows="5"> </textarea>
+                    <button class="send"> Send</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="js/client.js"></script>
+    <script src="./js/commonScript.js"></script>
+</div>
 </body>
 </html>

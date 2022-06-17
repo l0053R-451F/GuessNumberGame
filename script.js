@@ -46,3 +46,4 @@ document.querySelector(".btn").addEventListener("click", function () {
 const displaySMS = (query, sms) => {
   document.querySelector("." + query).textContent = sms;
 };
+

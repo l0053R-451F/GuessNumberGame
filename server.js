@@ -11,7 +11,9 @@ const wss = new WebSocket.Server({server: server, path: '/api/v1/ws/game1'});
 
 const clients = new Map();
 const gameList = []
+
 wss.on('connection', ws => {
+
     ws.isAlive = true;
     ws.on('pong', heartbeat);
     ws.on('message', (messageAsString) => {
@@ -23,16 +25,25 @@ wss.on('connection', ws => {
             ws.uid = id
             const username = data.username;
             const metadata = {id, username};
-            ws.send(JSON.stringify({id, username}))
+            ws.send(JSON.stringify({
+                'message': 'userInfo',
+                id,
+                username
+            }))
             clients.set(ws, metadata);
             sendAvailableGameToSelf(ws.uid)
         }
+
         if (data.action === 'create') {
+            const now = new Date();
+            const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
             const newGameData = {
                 id: Math.floor(1000 + Math.random() * 9000),
-                players: [ws.uid]
+                players: [ws.uid],
+                createdAt: new Date()
             }
             gameList.push(newGameData)
+
             sendAvailableGameToAll()
         }
     })
@@ -83,11 +94,18 @@ function uuidv4() {
 }
 
 function heartbeat() {
+    /*
+    * this process it not perfect
+    * */
+    for (let game of gameList) {
+        const created = new Date(game.createdAt)
+        if (new Date() > new Date(created.getTime() + 5 * 60000)) {
+            gameList.splice(gameList.indexOf(game), 1);
+            sendAvailableGameToAll()
+        }
+    }
+    /**/
     this.isAlive = true;
-}
-
-function send(payload) {
-
 }
 
 app.get('/', (req, res) => res.send('Hello World!'))

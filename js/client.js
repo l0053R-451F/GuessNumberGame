@@ -8,8 +8,15 @@ function heartbeat() {
         console.log('dead')
     }, 300 + 100);
 }
+//disable game bord for initial entry
+document.getElementById('gameBoard').classList.add('hidden')
+document.getElementById('in-game-chat').classList.add('hidden')
+
 
 function connect() {
+    //disable game bord for initial entry
+    document.getElementById('gameBoard').classList.add('hidden')
+
     //live https://ishaf-ws.herokuapp.com/
     ws = new WebSocket('ws://localhost:8485/api/v1/ws/game1')
     ws.addEventListener('ping', heartbeat)
@@ -34,6 +41,11 @@ function connect() {
                 gamesAvail = data.gameList;
                 let gameHTML=''
                 for (let game of gamesAvail){
+                    //console.log(userInfo.id)
+                    if (game.players[0] === userInfo.id || game.players[1] === userInfo.id){
+                        document.getElementById('gameBoard').classList.remove('hidden')
+                        document.getElementById('in-game-chat').classList.remove('hidden')
+                    }
                     gameHTML =gameHTML+`
                     <div class="game-list">
                         <span>${game.id}</span>
@@ -51,7 +63,6 @@ function connect() {
                 const userInfoHTML = `
                 <div >
                     <span> ${data.username}</span>
-                    
                 </div>
                 `
                 document.getElementById("userInfo").innerHTML = userInfoHTML;
@@ -68,12 +79,6 @@ function createNewGame() {
     send(payLoad)
 }
 
-if (ws) {
-
-}
-else {
-    document.getElementById('connect').disabled =false;
-}
 const id = localStorage.getItem('id');
 if (id) {
     //document.getElementById('connect').disabled =true

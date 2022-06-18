@@ -35,11 +35,19 @@ wss.on('connection', ws => {
         }
 
         if (data.action === 'create') {
-            const now = new Date();
-            const utc = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+            const mainNumbers = [4,9,2,3,5,7,8,1,6]
+            const mainResult = 15;
+            const random = Math.floor(Math.random() * 10)
+            const newNumbers =[]
+            const newResult = Math.pow(random, mainResult);
+            for (let number of mainNumbers){
+                newNumbers.push(Math.pow(random, number))
+            }
             const newGameData = {
                 id: Math.floor(1000 + Math.random() * 9000),
                 players: [ws.uid],
+                numbers:newNumbers,
+                result:newResult,
                 createdAt: new Date()
             }
             gameList.push(newGameData)

@@ -38,6 +38,9 @@ header {
   color: #696969;
   cursor: auto;
 }
+.btn:hover{
+  background-color: #d9d9d9;
+}
 header p {
   font-size: 2rem;
   letter-spacing: 5px;
@@ -169,7 +172,7 @@ span.ripple {
   padding: 3px;
   font-size: 1rem;
 }
-.game-bord{
+.game-board{
   border: 1px solid gray;
   display: flex;
   justify-content: space-between;
@@ -179,7 +182,10 @@ span.ripple {
   padding: 12px;
   margin-top: 6px;
 }
-.game-bord *{
+.hidden{
+  visibility: hidden;
+}
+.game-board *{
   padding: 12px;
 }
 .game-card-container{
@@ -205,6 +211,8 @@ span.ripple {
 }
 .chat-box{
   width: 400px;
+  display: flex;
+  flex-direction: column;
 }
 .message-input{
   position: absolute;
@@ -232,4 +240,7 @@ span.ripple {
 #result{
   font-size: 3rem;
   color: green;
+}
+.player{
+  width: 250px;
 }

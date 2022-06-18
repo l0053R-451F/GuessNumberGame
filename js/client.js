@@ -44,14 +44,20 @@ function connect() {
                     //console.log(userInfo.id)
                     if (game.players[0] === userInfo.id || game.players[1] === userInfo.id){
                         document.getElementById('gameBoard').classList.remove('hidden')
-                        document.getElementById('in-game-chat').classList.remove('hidden')
+                        document.getElementById('gameBoard').classList.remove('hidden')
+                        document.getElementById('create').disabled = true
                     }
-                    gameHTML =gameHTML+`
-                    <div class="game-list">
-                        <span>${game.id}</span>
-                        <button class="join-button">Join Now!</button>
-                    </div>
-                    `
+                    else {
+                        if (game.players.length<2){
+                            gameHTML =gameHTML+`
+                            <div class="game-list">
+                                <span>${game.id}</span>
+                                <button id="${game.id}" onclick="joinGame(this)" class="join-button">Join Now!</button>
+                            </div>
+                            `
+                        }
+                    }
+
                 }
                 document.getElementById("gameList").innerHTML = gameHTML;
             }
@@ -79,10 +85,13 @@ function createNewGame() {
     send(payLoad)
 }
 
-const id = localStorage.getItem('id');
-if (id) {
-    //document.getElementById('connect').disabled =true
-    console.log('test storage', id) // now need to reconnect with existing id
+function joinGame(event){
+    const gameId= event.id
+    const payLoad = {
+        'action': 'join',
+        'gameId':gameId
+    }
+    send(payLoad)
 }
 
 function send(payLoad) {

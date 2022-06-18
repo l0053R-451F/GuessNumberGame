@@ -123,6 +123,7 @@ section {
 button{
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 span.ripple {

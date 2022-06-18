@@ -31,13 +31,14 @@ wss.on('connection', ws => {
                 username
             }))
             clients.set(ws, metadata);
-            sendAvailableGameToSelf(ws.uid)
+            sendAvailableGameToAll()
         }
 
         if (data.action === 'create') {
             const mainNumbers = [4,9,2,3,5,7,8,1,6]
             const mainResult = 15;
-            const random = Math.floor(Math.random() * 10)
+
+            const random = randomNumber()
             const newNumbers =[]
             const newResult = Math.pow(random, mainResult);
             for (let number of mainNumbers){
@@ -54,6 +55,18 @@ wss.on('connection', ws => {
 
             sendAvailableGameToAll()
         }
+        if (data.action === 'join'){
+            const gameId = data.gameId;
+            const uid = ws.uid
+            ///console.log(uid,gameId)
+            for (let game of gameList){
+               if (game.id.toString() === gameId.toString()){
+                   game.players.push(uid)
+               }
+            }
+            sendAvailableGameToAll()
+
+        }
     })
 
 });
@@ -67,23 +80,11 @@ const interval = setInterval(function ping() {
 }, 300);
 
 
-function sendAvailableGameToSelf(id) {
-    wss.clients.forEach(ws => {
-        if (ws.uid === id) {
-            ws.send(JSON.stringify({
-                'message': 'gamesAvailResponse',
-                gameList,
-
-            }))
-        }
-    })
-}
-
 function sendAvailableGameToAll() {
     wss.clients.forEach(ws => {
         ws.send(JSON.stringify({
             'message': 'gamesAvailResponse',
-            gameList,
+            gameList
 
         }))
     })
@@ -100,7 +101,15 @@ function uuidv4() {
         return v.toString(16);
     });
 }
+function randomNumber(){
+    const number = Math.floor(Math.random() * 10)
+    if (number ===0 || number===1){
+        randomNumber()
+    }else {
+        return number;
+    }
 
+}
 function heartbeat() {
     /*
     * this process it not perfect

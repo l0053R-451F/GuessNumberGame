@@ -33,6 +33,14 @@ header {
   padding: 2rem 3rem;
   cursor: pointer;
 }
+.btn:disabled{
+  background-color: #9d9d9d;
+  color: #696969;
+  cursor: auto;
+}
+.btn:hover{
+  background-color: #d9d9d9;
+}
 header p {
   font-size: 2rem;
   letter-spacing: 5px;
@@ -111,4 +119,129 @@ section {
   flex-direction: column;
   justify-content: center;
   gap: 20px 0px;
+}
+button{
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+span.ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple 600ms linear;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/*game2*/
+.game2-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.game2{
+  font-size: 2rem;
+  padding: 28px;
+}
+.game-container{
+  margin-top: 12px;
+  display: flex;
+  gap: 50px;
+}
+#gameList{
+  padding: 6px;
+  width: 250px;
+  border: 1px solid gray;
+  border-radius: 6px;
+}
+.game-list{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid gray;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+.join-button{
+  padding: 3px;
+  font-size: 1rem;
+}
+.game-board{
+  border: 1px solid gray;
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 6px;
+}
+.hidden{
+  visibility: hidden;
+}
+.game-board *{
+  padding: 12px;
+}
+.game-card-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-left: 1px solid gray;
+  border-right: 1px solid gray;
+}
+.card-row{
+  display: flex;
+  flex-wrap: wrap;
+  width: 500px;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+.card{
+  height: 150px;
+  width: 100px;
+  background-color: cadetblue;
+  border-radius: 6px;
+}
+.chat-box{
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+.message-input{
+  position: absolute;
+  border-top: 1px solid gray;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.send{
+  font-size: 1.5rem;
+  padding: 6px;
+}
+#in-game-chat,
+#global-chat{
+  position: relative;
+  border: 1px solid gray;
+  border-radius: 6px;
+  height: 300px;
+  overflow: auto;
+}
+#result{
+  font-size: 3rem;
+  color: green;
+}
+.player{
+  width: 250px;
 }

@@ -12,39 +12,6 @@ const wss = new WebSocket.Server({server: server, path: '/api/v1/ws/game1'});
 const clients = new Map();
 const gameList = []
 
-function curentGame(gameId,palyers) {
-    for (let player of palyers){
-        const payload ={
-            message:'yourGame',
-            id:gameId
-        }
-    }
-    let playerData = []
-    for (let game of gamesAvail){
-        if (game.id === data.id){
-            for (let palyer in game.players){
-                if (palyer === 0){
-                    playerData.push({
-
-                    })
-                }
-                else {
-                    playerData.push({
-                        id: game.players[1].id,
-                        userName: game.players[1].userName,
-                        firstTurn:false,
-                        picketNumbers:[]
-                    })
-                }
-            }
-        }
-    }
-    currentGame ={
-        id: game.id,
-        playerData
-    }
-}
-
 wss.on('connection', ws => {
 
     ws.isAlive = true;

@@ -65,7 +65,7 @@ function connect(userData) {
                     document.getElementById("gameList").innerHTML = gameHTML;
 
 
-                    if (game.players[0].id === userInfo.id || game.players[1].id === userInfo.id){
+                    if (game.players[0].id === userInfo.id || (game.players[1] && game.players[1].id === userInfo.id)){
                         document.getElementById('gameBoard').classList.remove('hidden')
                         let cards =''
                         for (let number of game.numbers){
@@ -98,13 +98,21 @@ function connect(userData) {
                         document.getElementById('cards').innerHTML =cards
                         document.getElementById('in-game-chat').classList.remove('hidden')
                         if (game.players[0].id === userInfo.id){
+
                             document.getElementById('player1').innerHTML = `${game.players[0].userName} numbers: ${game.players[0].picketNumbers}`
-                            if (game.players[1].id){
+                            if (game.players[1]){
                                 document.getElementById('player2').innerHTML = `${game.players[1].userName} numbers: ${game.players[1].picketNumbers}`
                             }
                         }else if (game.players[1].id === userInfo.id){
+
                             document.getElementById('player2').innerHTML = `${game.players[1].userName} numbers: ${game.players[1].picketNumbers}`
                             document.getElementById('player1').innerHTML = `${game.players[0].userName} numbers: ${game.players[0].picketNumbers}`
+                        }
+                        if (game.players[0].picketNumbers.length>=3){
+                            alert('player1 win the game')
+                        }
+                        else if (game.players[1].picketNumbers.length>=3){
+                            alert('player2 win the game')
                         }
                     }
                 }
@@ -154,6 +162,26 @@ function pickCard(gameId,playerId,that){
     }
     send(payLoad)
 }
+function findResult(arr, sum){
+    const map = new Map();
+    for(let i = 0; i < arr.length; i++){
+        map.set(parseInt(arr[i]), parseInt(i));
+    }
+    for(let i = 0; i < arr.length - 1; i++){
+
+        for(let j = i + 1; j < arr.length; j++){
+            let val = sum / (arr[i] * arr[j]);
+            if(map.has(val)){
+                if (map.get(val) !== i && map.get(val) !== j) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+
 function send(payLoad) {
     ws.send(JSON.stringify(payLoad))
 }

@@ -12,6 +12,39 @@ const wss = new WebSocket.Server({server: server, path: '/api/v1/ws/game1'});
 const clients = new Map();
 const gameList = []
 
+function curentGame(gameId,palyers) {
+    for (let player of palyers){
+        const payload ={
+            message:'yourGame',
+            id:gameId
+        }
+    }
+    let playerData = []
+    for (let game of gamesAvail){
+        if (game.id === data.id){
+            for (let palyer in game.players){
+                if (palyer === 0){
+                    playerData.push({
+
+                    })
+                }
+                else {
+                    playerData.push({
+                        id: game.players[1].id,
+                        userName: game.players[1].userName,
+                        firstTurn:false,
+                        picketNumbers:[]
+                    })
+                }
+            }
+        }
+    }
+    currentGame ={
+        id: game.id,
+        playerData
+    }
+}
+
 wss.on('connection', ws => {
 
     ws.isAlive = true;
@@ -22,6 +55,7 @@ wss.on('connection', ws => {
 
         if (data.action === 'connect') {
             const id = uuidv4();
+            ws.userName = data.username;
             ws.uid = id
             const username = data.username;
             const metadata = {id, username};
@@ -42,18 +76,27 @@ wss.on('connection', ws => {
             const newNumbers =[]
             const newResult = Math.pow(random, mainResult);
             for (let number of mainNumbers){
-                newNumbers.push(Math.pow(random, number))
+                const ne = Math.pow(random, number)
+                newNumbers.push(ne)
+                console.log(random, number,ne)
             }
             const newGameData = {
                 id: Math.floor(1000 + Math.random() * 9000),
-                players: [ws.uid],
+                players: [
+                    {
+                        id:ws.uid,
+                        userName:ws.userName,
+                        isTurn:true,
+                        picketNumbers:[]
+                    }
+                    ],
                 numbers:newNumbers,
                 result:newResult,
                 createdAt: new Date()
             }
             gameList.push(newGameData)
-
             sendAvailableGameToAll()
+            //curentGame(newGameData.id,newGameData.players)
         }
         if (data.action === 'join'){
             const gameId = data.gameId;
@@ -61,11 +104,38 @@ wss.on('connection', ws => {
             ///console.log(uid,gameId)
             for (let game of gameList){
                if (game.id.toString() === gameId.toString()){
-                   game.players.push(uid)
+                   game.players.push({
+                       id:ws.uid,
+                       userName:ws.userName,
+                       isTurn:false,
+                       picketNumbers:[]
+                   })
                }
             }
+
             sendAvailableGameToAll()
 
+        }
+        if (data.action === 'picked'){
+            const gameId = data.gameId;
+            const playerId = data.playerId
+            const number = data.number
+            for (let game of gameList){
+                if (game.id.toString() === gameId.toString()){
+                    for (let player of game.players){
+                        if (player.id.toString() === playerId.toString() ){
+                            player.picketNumbers.push(number)
+                            player.isTurn =false
+                        }
+                        else {
+                            player.isTurn = true
+                        }
+                    }
+                    console.log(game.numbers.indexOf(parseInt(number)))
+                    game.numbers[game.numbers.indexOf(parseInt(number))] =0
+                }
+            }
+            sendAvailableGameToAll()
         }
     })
 
@@ -102,13 +172,12 @@ function uuidv4() {
     });
 }
 function randomNumber(){
-    const number = Math.floor(Math.random() * 10)
-    if (number ===0 || number===1){
-        randomNumber()
-    }else {
-        return number;
-    }
+    let range = {min: 2, max: 9}
+    let delta = range.max - range.min
 
+    const rand = Math.round(range.min + Math.random() * delta)
+    console.log(rand,'rand')
+    return rand
 }
 function heartbeat() {
     /*

@@ -45,7 +45,7 @@ wss.on('connection', ws => {
             for (let number of mainNumbers){
                 const ne = Math.pow(random, number)
                 newNumbers.push(ne)
-                console.log(random, number,ne)
+
             }
             const newGameData = {
                 id: Math.floor(1000 + Math.random() * 9000),
@@ -59,6 +59,7 @@ wss.on('connection', ws => {
                     ],
                 numbers:newNumbers,
                 result:newResult,
+                status:'active',
                 createdAt: new Date()
             }
             gameList.push(newGameData)
@@ -77,6 +78,7 @@ wss.on('connection', ws => {
                        isTurn:false,
                        picketNumbers:[]
                    })
+                   game.status ='running'
                }
             }
 
@@ -98,7 +100,6 @@ wss.on('connection', ws => {
                             player.isTurn = true
                         }
                     }
-                    console.log(game.numbers.indexOf(parseInt(number)))
                     game.numbers[game.numbers.indexOf(parseInt(number))] =0
                 }
             }
@@ -117,13 +118,79 @@ const interval = setInterval(function ping() {
 }, 300);
 
 
-function sendAvailableGameToAll() {
-    wss.clients.forEach(ws => {
-        ws.send(JSON.stringify({
-            'message': 'gamesAvailResponse',
-            gameList
+function findGameByPlayerId(uid) {
+    for (let game of gameList){
 
-        }))
+        for (let player of game.players){
+            if (uid === player.id){
+                return game
+            }
+        }
+    }
+}
+
+function sendAvailableGameToAll() {
+    let availGames=[]
+    let playinRightNow=[]
+    let notPlayinRightNow=[]
+    for (let game of gameList){
+        if (game.status ==='active'){
+            if (game.players.length === 1){
+            }
+            availGames.push(game)
+        }
+        if (game.status ==='running'){
+            for (let player of game.players){
+                playinRightNow.push(player.id)
+            }
+        }
+
+    }
+    wss.clients.forEach(ws => {
+        if (playinRightNow.indexOf(ws.uid) === -1){
+            notPlayinRightNow.push(ws.uid)
+        }
+    })
+    console.log(playinRightNow,'running')
+    console.log(notPlayinRightNow,'not running')
+
+    //
+    wss.clients.forEach(ws => {
+        /*ws.send(JSON.stringify({
+            'message': 'gamesAvailResponse',
+            'gameList':availGames
+        }))*/
+        if (playinRightNow.length>0){
+            //console.log(playinRightNow)
+            for (let runningPlayer of playinRightNow){
+                if (ws.uid === runningPlayer){
+                    const gameeee =findGameByPlayerId(ws.uid)
+                    ws.send(JSON.stringify({
+                        'message': 'gamesAvailResponse',
+                        'gameList':[gameeee]
+                    }))
+                }
+            }
+        }
+        else {
+            ws.send(JSON.stringify({
+                    'message': 'gamesAvailResponse',
+                    'gameList':availGames
+                }))
+        }
+        //console.log(availGames)
+        //console.log(notPlayinRightNow,'not playing')
+        for (let Player of notPlayinRightNow){
+            if (ws.uid === Player){
+                //console.log(Player ,'nott')
+                ws.send(JSON.stringify({
+                    'message': 'gamesAvailResponse',
+                    'gameList':availGames
+                }))
+            }
+        }
+
+
     })
 }
 
@@ -143,7 +210,6 @@ function randomNumber(){
     let delta = range.max - range.min
 
     const rand = Math.round(range.min + Math.random() * delta)
-    console.log(rand,'rand')
     return rand
 }
 function heartbeat() {

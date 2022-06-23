@@ -51,70 +51,83 @@ function connect(userData) {
                 gamesAvail = data.gameList;
                 let gameHTML=''
 
-                for (let game of gamesAvail){
-                    gameConst = game
-                    if (game.players.length<2 && game.players[0].id !== userInfo.id){
-                        //create list
-                        gameHTML =gameHTML+`
+                if (data.gameList.length>0){
+                    for (let game of gamesAvail){
+                        gameConst = game
+                        if (game.players.length<2 && game.players[0].id !== userInfo.id){
+                            //create list
+                            gameHTML =gameHTML+`
                             <div class="game-list">
                                 <span>${game.id}</span>
                                 <button id="${game.id}" onclick="joinGame(this)" class="join-button">Join Now!</button>
                             </div>
                             `
-                    }
-                    document.getElementById("gameList").innerHTML = gameHTML;
+                        }
+                        document.getElementById("gameList").innerHTML = gameHTML;
 
 
-                    if (game.players[0].id === userInfo.id || (game.players[1] && game.players[1].id === userInfo.id)){
-                        document.getElementById('gameBoard').classList.remove('hidden')
-                        let cards =''
-                        for (let number of game.numbers){
-                            for (let player of game.players){
-                                if (player.id === userInfo.id){
-                                    if (player.isTurn && number !==0){
-                                        cards =cards+ `
-                            <div id="${number}" class="card" style="cursor: pointer" onclick="pickCard(gameConst.id,userInfo.id,this)">${number}</div>
-                            `
-                                    }
-                                    else if (number ===0){
-                                        cards =cards+ `
-                            <div style="cursor: not-allowed" class="card"></div>
-                            `
-                                    }
-                                    else {
-                                        cards =cards+ `
+                        if (game.players[0].id === userInfo.id || (game.players[1] && game.players[1].id === userInfo.id)){
+
+                            document.getElementById('gameBoard').classList.remove('hidden')
+                            document.getElementById('gameList').classList.add('hidden')
+                            document.getElementById('create').classList.add('hidden')
+                            let cards =''
+                            for (let number of game.numbers){
+                                for (let player of game.players){
+                                    if (player.id === userInfo.id){
+                                        if (game.players.length<2){
+                                            cards =cards+ `
                             <div style="cursor: not-allowed" class="card">${number}</div>
                             `
+                                        }else {
+                                            if (player.isTurn && number !==0){
+                                                cards =cards+ `
+                            <div id="${number}" class="card" style="cursor: pointer" onclick="pickCard(gameConst.id,userInfo.id,this)">${number}</div>
+                            `
+                                            }
+                                            else if (number ===0){
+                                                cards =cards+ `
+                            <div style="cursor: not-allowed" class="card"></div>
+                            `
+                                            }
+                                            else{
+                                                cards =cards+ `
+                            <div style="cursor: not-allowed" class="card">${number}</div>
+                            `
+                                            }
+                                        }
                                     }
+
                                 }
 
                             }
-
-                        }
-                        document.getElementById('result').innerHTML =`
+                            document.getElementById('result').innerHTML =`
                                         You are Playing For total <span style="color:red">${game.result}</span> Points
                                         <p style="color: white;font-size: 21px">Pick one card for each turn carefuly. Multiply them and you will get the result</p>
                                         `
-                        document.getElementById('cards').innerHTML =cards
-                        document.getElementById('in-game-chat').classList.remove('hidden')
-                        if (game.players[0].id === userInfo.id){
+                            document.getElementById('cards').innerHTML =cards
+                            document.getElementById('in-game-chat').classList.remove('hidden')
+                            if (game.players[0].id === userInfo.id){
 
-                            document.getElementById('player1').innerHTML = `${game.players[0].userName} numbers: ${game.players[0].picketNumbers}`
-                            if (game.players[1]){
+                                document.getElementById('player1').innerHTML = `${game.players[0].userName} numbers: ${game.players[0].picketNumbers}`
+                                if (game.players[1]){
+                                    document.getElementById('player2').innerHTML = `${game.players[1].userName} numbers: ${game.players[1].picketNumbers}`
+                                }
+                            }else if (game.players[1].id === userInfo.id){
+
                                 document.getElementById('player2').innerHTML = `${game.players[1].userName} numbers: ${game.players[1].picketNumbers}`
+                                document.getElementById('player1').innerHTML = `${game.players[0].userName} numbers: ${game.players[0].picketNumbers}`
                             }
-                        }else if (game.players[1].id === userInfo.id){
-
-                            document.getElementById('player2').innerHTML = `${game.players[1].userName} numbers: ${game.players[1].picketNumbers}`
-                            document.getElementById('player1').innerHTML = `${game.players[0].userName} numbers: ${game.players[0].picketNumbers}`
-                        }
-                        if (game.players[0].picketNumbers.length>=3){
-                            alert('player1 win the game')
-                        }
-                        else if (game.players[1].picketNumbers.length>=3){
-                            alert('player2 win the game')
+                            if (game.players[0].picketNumbers.length>=3){
+                                alert('player1 win the game')
+                            }
+                            else if (game.players[1].picketNumbers.length>=3){
+                                alert('player2 win the game')
+                            }
                         }
                     }
+                }else {
+                    document.getElementById("gameList").innerHTML = ' '
                 }
 
             }

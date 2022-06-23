@@ -36,13 +36,13 @@ wss.on('connection', ws => {
         }
 
         if (data.action === 'create') {
-            const mainNumbers = [4,9,2,3,5,7,8,1,6]
+            const mainNumbers = [4, 9, 2, 3, 5, 7, 8, 1, 6]
             const mainResult = 15;
 
             const random = randomNumber()
-            const newNumbers =[]
+            const newNumbers = []
             const newResult = Math.pow(random, mainResult);
-            for (let number of mainNumbers){
+            for (let number of mainNumbers) {
                 const ne = Math.pow(random, number)
                 newNumbers.push(ne)
 
@@ -51,58 +51,64 @@ wss.on('connection', ws => {
                 id: Math.floor(1000 + Math.random() * 9000),
                 players: [
                     {
-                        id:ws.uid,
-                        userName:ws.userName,
-                        isTurn:true,
-                        picketNumbers:[]
+                        id: ws.uid,
+                        userName: ws.userName,
+                        isTurn: true,
+                        picketNumbers: []
                     }
-                    ],
-                numbers:newNumbers,
-                result:newResult,
-                status:'active',
+                ],
+                numbers: newNumbers,
+                result: newResult,
+                status: 'active',
                 createdAt: new Date()
             }
             gameList.push(newGameData)
             sendAvailableGameToAll()
-            //curentGame(newGameData.id,newGameData.players)
         }
-        if (data.action === 'join'){
+        if (data.action === 'join') {
             const gameId = data.gameId;
-            const uid = ws.uid
-            ///console.log(uid,gameId)
-            for (let game of gameList){
-               if (game.id.toString() === gameId.toString()){
-                   game.players.push({
-                       id:ws.uid,
-                       userName:ws.userName,
-                       isTurn:false,
-                       picketNumbers:[]
-                   })
-                   game.status ='running'
-               }
+            for (let game of gameList) {
+                if (game.id.toString() === gameId.toString()) {
+                    game.players.push({
+                        id: ws.uid,
+                        userName: ws.userName,
+                        isTurn: false,
+                        picketNumbers: []
+                    })
+                    game.status = 'running'
+                }
             }
 
             sendAvailableGameToAll()
 
         }
-        if (data.action === 'picked'){
+        if (data.action === 'picked') {
             const gameId = data.gameId;
             const playerId = data.playerId
             const number = data.number
-            for (let game of gameList){
-                if (game.id.toString() === gameId.toString()){
-                    for (let player of game.players){
-                        if (player.id.toString() === playerId.toString() ){
+            for (let game of gameList) {
+                if (game.id.toString() === gameId.toString()) {
+                    for (let player of game.players) {
+                        if (player.id.toString() === playerId.toString()) {
                             player.picketNumbers.push(number)
-                            player.isTurn =false
-                        }
-                        else {
+                            player.isTurn = false
+                        } else {
                             player.isTurn = true
                         }
                     }
-                    game.numbers[game.numbers.indexOf(parseInt(number))] =0
+                    game.numbers[game.numbers.indexOf(parseInt(number))] = 0
                 }
             }
+            sendAvailableGameToAll()
+        }
+        if (data.action === 'gameFinished'){
+            const gameId = data.gameId;
+            for (let game of gameList) {
+                if (game.id.toString() === gameId.toString()) {
+                    game.status = 'finished'
+                }
+            }
+
             sendAvailableGameToAll()
         }
     })
@@ -119,10 +125,10 @@ const interval = setInterval(function ping() {
 
 
 function findGameByPlayerId(uid) {
-    for (let game of gameList){
+    for (let game of gameList) {
 
-        for (let player of game.players){
-            if (uid === player.id){
+        for (let player of game.players) {
+            if (uid === player.id) {
                 return game
             }
         }
@@ -130,62 +136,49 @@ function findGameByPlayerId(uid) {
 }
 
 function sendAvailableGameToAll() {
-    let availGames=[]
-    let playinRightNow=[]
-    let notPlayinRightNow=[]
-    for (let game of gameList){
-        if (game.status ==='active'){
-            if (game.players.length === 1){
+    let availGames = []
+    let playinRightNow = []
+    let notPlayinRightNow = []
+    for (let game of gameList) {
+        if (game.status === 'active') {
+            if (game.players.length === 1) {
             }
             availGames.push(game)
         }
-        if (game.status ==='running'){
-            for (let player of game.players){
+        if (game.status === 'running') {
+            for (let player of game.players) {
                 playinRightNow.push(player.id)
             }
         }
 
     }
     wss.clients.forEach(ws => {
-        if (playinRightNow.indexOf(ws.uid) === -1){
+        if (playinRightNow.indexOf(ws.uid) === -1) {
             notPlayinRightNow.push(ws.uid)
         }
     })
-    console.log(playinRightNow,'running')
-    console.log(notPlayinRightNow,'not running')
-
-    //
     wss.clients.forEach(ws => {
-        /*ws.send(JSON.stringify({
-            'message': 'gamesAvailResponse',
-            'gameList':availGames
-        }))*/
-        if (playinRightNow.length>0){
-            //console.log(playinRightNow)
-            for (let runningPlayer of playinRightNow){
-                if (ws.uid === runningPlayer){
-                    const gameeee =findGameByPlayerId(ws.uid)
+        if (playinRightNow.length > 0) {
+            for (let runningPlayer of playinRightNow) {
+                if (ws.uid === runningPlayer) {
+                    const gameeee = findGameByPlayerId(ws.uid)
                     ws.send(JSON.stringify({
                         'message': 'gamesAvailResponse',
-                        'gameList':[gameeee]
+                        'gameList': [gameeee]
                     }))
                 }
             }
-        }
-        else {
+        } else {
             ws.send(JSON.stringify({
-                    'message': 'gamesAvailResponse',
-                    'gameList':availGames
-                }))
+                'message': 'gamesAvailResponse',
+                'gameList': availGames
+            }))
         }
-        //console.log(availGames)
-        //console.log(notPlayinRightNow,'not playing')
-        for (let Player of notPlayinRightNow){
-            if (ws.uid === Player){
-                //console.log(Player ,'nott')
+        for (let Player of notPlayinRightNow) {
+            if (ws.uid === Player) {
                 ws.send(JSON.stringify({
                     'message': 'gamesAvailResponse',
-                    'gameList':availGames
+                    'gameList': availGames
                 }))
             }
         }
@@ -205,20 +198,22 @@ function uuidv4() {
         return v.toString(16);
     });
 }
-function randomNumber(){
+
+function randomNumber() {
     let range = {min: 2, max: 9}
     let delta = range.max - range.min
 
     const rand = Math.round(range.min + Math.random() * delta)
     return rand
 }
+
 function heartbeat() {
     /*
-    * this process it not perfect
+    * this process is not perfect
     * */
     for (let game of gameList) {
         const created = new Date(game.createdAt)
-        if (new Date() > new Date(created.getTime() + 5 * 60000)) {
+        if (new Date() > new Date(created.getTime() + 15 * 60000)) {
             gameList.splice(gameList.indexOf(game), 1);
             sendAvailableGameToAll()
         }

@@ -23,6 +23,8 @@ function getFormData(e) {
 document.getElementById('userform').addEventListener('submit',getFormData)
 
 
+
+
 function connect(userData) {
     //disable game bord for initial entry
     document.getElementById('gameBoard').classList.add('hidden')
@@ -118,17 +120,34 @@ function connect(userData) {
                                 document.getElementById('player2').innerHTML = `${game.players[1].userName} numbers: ${game.players[1].picketNumbers}`
                                 document.getElementById('player1').innerHTML = `${game.players[0].userName} numbers: ${game.players[0].picketNumbers}`
                             }
-                            if (game.players[0].picketNumbers.length>=3){
+                            if (game && game.players[0].picketNumbers.length>=3 && findResult(game.players[0].picketNumbers,game.result)){
                                 alert('player1 win the game')
+                                finishGame(game.id)
                             }
-                            else if (game.players[1].picketNumbers.length>=3){
+                            else if (game && game.players[1] && game.players[1].picketNumbers.length>=3 && findResult(game.players[1].picketNumbers,game.result)){
                                 alert('player2 win the game')
+                                finishGame(game.id)
                             }
+                            else if (game && game.numbers.every(zeroTest)){
+                                alert('draw')
+                                finishGame(game.id)
+                            }
+
+                        }
+                        else {
+                            document.getElementById('gameBoard').classList.add('hidden')
+                            document.getElementById('gameList').classList.remove('hidden')
+                            document.getElementById('create').classList.remove('hidden')
                         }
                     }
                 }else {
-                    document.getElementById("gameList").innerHTML = ' '
+                    document.getElementById("gameList").innerHTML = ''
+                    document.getElementById('gameBoard').classList.add('hidden')
+                    document.getElementById('gameList').classList.remove('hidden')
+                    document.getElementById('create').classList.remove('hidden')
+
                 }
+
 
             }
             if (data.message === 'yourGame') {
@@ -150,7 +169,9 @@ function connect(userData) {
     })
 
 }
-
+function zeroTest(element) {
+    return element === 0;
+}
 function createNewGame() {
     const payLoad = {
         'action': 'create',
@@ -172,6 +193,13 @@ function pickCard(gameId,playerId,that){
         'gameId':gameId,
         playerId,
         number:that.id
+    }
+    send(payLoad)
+}
+function finishGame(id) {
+    const payLoad = {
+        'action': 'gameFinished',
+        'gameId':id,
     }
     send(payLoad)
 }

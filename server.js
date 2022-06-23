@@ -101,7 +101,7 @@ wss.on('connection', ws => {
             }
             sendAvailableGameToAll()
         }
-        if (data.action === 'gameFinished'){
+        if (data.action === 'gameFinished') {
             const gameId = data.gameId;
             for (let game of gameList) {
                 if (game.id.toString() === gameId.toString()) {

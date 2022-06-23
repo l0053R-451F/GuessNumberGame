@@ -1,3 +1,5 @@
-Api: /api/v1/ws/game1
+#game 2
 
-on connection send message { 'action':"connect","username":"username" }
+live:https://l0053r-451f.github.io/GuessNumberGame/game2.html
+
+note: you may face some issue with 'Websocket Heartbeat Keep Alive' for heroku server. use locally, its the best :( 

@@ -206,9 +206,14 @@ span.ripple {
 }
 .card{
   height: 150px;
-  width: 100px;
+  width: 120px;
   background-color: cadetblue;
   border-radius: 6px;
+  font-size: 26px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  word-break: break-word;
 }
 .chat-box{
   width: 400px;
@@ -244,4 +249,15 @@ span.ripple {
 }
 .player{
   width: 250px;
+}
+.input-text {
+  padding: 2rem 3rem;
+  background: none;
+  border: 2px solid #eee;
+  color: #eee;
+  border-radius: 6px;
+  font-size: 2rem;
+  max-width: 28rem;
+  text-align: center;
+  transition: all 500ms linear;
 }

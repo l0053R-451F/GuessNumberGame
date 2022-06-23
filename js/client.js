@@ -1,6 +1,7 @@
 let ws
 let gamesAvail
 let userInfo
+let currentGame
 function heartbeat() {
     clearTimeout(this.pingTimeout);
     this.pingTimeout = setTimeout(() => {
@@ -11,14 +12,25 @@ function heartbeat() {
 //disable game bord for initial entry
 document.getElementById('gameBoard').classList.add('hidden')
 document.getElementById('in-game-chat').classList.add('hidden')
+let gameConst
+function getFormData(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const formProps = Object.fromEntries(formData);
+    connect(formProps)
+}
+
+document.getElementById('userform').addEventListener('submit',getFormData)
 
 
-function connect() {
+
+
+function connect(userData) {
     //disable game bord for initial entry
     document.getElementById('gameBoard').classList.add('hidden')
 
     //live https://ishaf-ws.herokuapp.com/
-    ws = new WebSocket('ws://localhost:8485/api/v1/ws/game1')
+    ws = new WebSocket('ws://ishaf-ws.herokuapp.com/api/v1/ws/game1')
     ws.addEventListener('ping', heartbeat)
     ws.addEventListener('close', ()=> {
         document.getElementById('connect').disabled =false;
@@ -28,10 +40,10 @@ function connect() {
         console.log('Connected')
 
         //disable connect button
-        document.getElementById('connect').disabled =true;
+        document.getElementById('connect-box').classList.add('hidden')
         const payLoad = {
             'action': 'connect',
-            'username': 'ishaf'
+            'username': userData.username
         }
         send(payLoad)
 
@@ -40,15 +52,12 @@ function connect() {
             if (data.message === 'gamesAvailResponse') {
                 gamesAvail = data.gameList;
                 let gameHTML=''
-                for (let game of gamesAvail){
-                    //console.log(userInfo.id)
-                    if (game.players[0] === userInfo.id || game.players[1] === userInfo.id){
-                        document.getElementById('gameBoard').classList.remove('hidden')
-                        document.getElementById('gameBoard').classList.remove('hidden')
-                        document.getElementById('create').disabled = true
-                    }
-                    else {
-                        if (game.players.length<2){
+
+                if (data.gameList.length>0){
+                    for (let game of gamesAvail){
+                        gameConst = game
+                        if (game.players.length<2 && game.players[0].id !== userInfo.id){
+                            //create list
                             gameHTML =gameHTML+`
                             <div class="game-list">
                                 <span>${game.id}</span>
@@ -56,10 +65,93 @@ function connect() {
                             </div>
                             `
                         }
+                        document.getElementById("gameList").innerHTML = gameHTML;
+
+
+                        if (game.players[0].id === userInfo.id || (game.players[1] && game.players[1].id === userInfo.id)){
+
+                            document.getElementById('gameBoard').classList.remove('hidden')
+                            document.getElementById('gameList').classList.add('hidden')
+                            document.getElementById('create').classList.add('hidden')
+                            let cards =''
+                            for (let number of game.numbers){
+                                for (let player of game.players){
+                                    if (player.id === userInfo.id){
+                                        if (game.players.length<2){
+                                            cards =cards+ `
+                            <div style="cursor: not-allowed" class="card">${number}</div>
+                            `
+                                        }else {
+                                            if (player.isTurn && number !==0){
+                                                cards =cards+ `
+                            <div id="${number}" class="card" style="cursor: pointer" onclick="pickCard(gameConst.id,userInfo.id,this)">${number}</div>
+                            `
+                                            }
+                                            else if (number ===0){
+                                                cards =cards+ `
+                            <div style="cursor: not-allowed" class="card"></div>
+                            `
+                                            }
+                                            else{
+                                                cards =cards+ `
+                            <div style="cursor: not-allowed" class="card">${number}</div>
+                            `
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                            }
+                            document.getElementById('result').innerHTML =`
+                                        You are Playing For total <span style="color:red">${game.result}</span> Points
+                                        <p style="color: white;font-size: 21px">Pick one card for each turn carefuly. Multiply them and you will get the result</p>
+                                        `
+                            document.getElementById('cards').innerHTML =cards
+                            document.getElementById('in-game-chat').classList.remove('hidden')
+                            if (game.players[0].id === userInfo.id){
+
+                                document.getElementById('player1').innerHTML = `${game.players[0].userName} numbers: ${game.players[0].picketNumbers}`
+                                if (game.players[1]){
+                                    document.getElementById('player2').innerHTML = `${game.players[1].userName} numbers: ${game.players[1].picketNumbers}`
+                                }
+                            }else if (game.players[1].id === userInfo.id){
+
+                                document.getElementById('player2').innerHTML = `${game.players[1].userName} numbers: ${game.players[1].picketNumbers}`
+                                document.getElementById('player1').innerHTML = `${game.players[0].userName} numbers: ${game.players[0].picketNumbers}`
+                            }
+                            if (game && game.players[0].picketNumbers.length>=3 && findResult(game.players[0].picketNumbers,game.result)){
+                                alert('player1 win the game')
+                                finishGame(game.id)
+                            }
+                            else if (game && game.players[1] && game.players[1].picketNumbers.length>=3 && findResult(game.players[1].picketNumbers,game.result)){
+                                alert('player2 win the game')
+                                finishGame(game.id)
+                            }
+                            else if (game && game.numbers.every(zeroTest)){
+                                alert('draw')
+                                finishGame(game.id)
+                            }
+
+                        }
+                        else {
+                            document.getElementById('gameBoard').classList.add('hidden')
+                            document.getElementById('gameList').classList.remove('hidden')
+                            document.getElementById('create').classList.remove('hidden')
+                        }
                     }
+                }else {
+                    document.getElementById("gameList").innerHTML = ''
+                    document.getElementById('gameBoard').classList.add('hidden')
+                    document.getElementById('gameList').classList.remove('hidden')
+                    document.getElementById('create').classList.remove('hidden')
 
                 }
-                document.getElementById("gameList").innerHTML = gameHTML;
+
+
+            }
+            if (data.message === 'yourGame') {
+
             }
             if (data.message === 'userInfo') {
                 userInfo = {
@@ -77,7 +169,9 @@ function connect() {
     })
 
 }
-
+function zeroTest(element) {
+    return element === 0;
+}
 function createNewGame() {
     const payLoad = {
         'action': 'create',
@@ -93,6 +187,41 @@ function joinGame(event){
     }
     send(payLoad)
 }
+function pickCard(gameId,playerId,that){
+    const payLoad = {
+        'action': 'picked',
+        'gameId':gameId,
+        playerId,
+        number:that.id
+    }
+    send(payLoad)
+}
+function finishGame(id) {
+    const payLoad = {
+        'action': 'gameFinished',
+        'gameId':id,
+    }
+    send(payLoad)
+}
+function findResult(arr, sum){
+    const map = new Map();
+    for(let i = 0; i < arr.length; i++){
+        map.set(parseInt(arr[i]), parseInt(i));
+    }
+    for(let i = 0; i < arr.length - 1; i++){
+
+        for(let j = i + 1; j < arr.length; j++){
+            let val = sum / (arr[i] * arr[j]);
+            if(map.has(val)){
+                if (map.get(val) !== i && map.get(val) !== j) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 
 function send(payLoad) {
     ws.send(JSON.stringify(payLoad))

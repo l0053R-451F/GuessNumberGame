@@ -30,7 +30,7 @@ function connect(userData) {
     document.getElementById('gameBoard').classList.add('hidden')
 
     //live https://ishaf-ws.herokuapp.com/
-    ws = new WebSocket('ws://ishaf-ws.herokuapp.com/api/v1/ws/game1')
+    ws = new WebSocket('wss://ishaf-ws.herokuapp.com/api/v1/ws/game1')
     ws.addEventListener('ping', heartbeat)
     ws.addEventListener('close', ()=> {
         document.getElementById('connect').disabled =false;

@@ -38,7 +38,10 @@ function connect(userData) {
     })
     ws.addEventListener("open", (res) => {
         console.log('Connected')
-
+        setInterval(function(){
+            const object = {"message":"ARandonMessage"};
+            send(object)
+        })
         //disable connect button
         document.getElementById('connect-box').classList.add('hidden')
         const payLoad = {
